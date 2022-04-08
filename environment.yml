@@ -1,0 +1,29 @@
+# install with: conda env create -n freqtrade-conda -f environment.yml
+# Update existing environment with conda env update --file environment.yml --prune
+# Note: the --prune option causes conda to remove any dependencies that are no longer required from the environment.
+name: freqtrade
+channels:
+  - conda-forge
+# - defaults
+dependencies:
+    # main req
+    - python>=3.8,<=3.10
+    - numpy
+    - pandas
+    - pip
+    - TA-Lib
+    - scipy
+    - scikit-learn
+    - scikit-optimize
+    - plotly
+    - jupyter
+    - matplotlib
+    # dev req
+    - black
+    - mypy
+    - pytest
+    - isort
+
+    - pip:
+        - pandas-ta
+        - freqtrade
