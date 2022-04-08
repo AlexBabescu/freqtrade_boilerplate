@@ -10,20 +10,32 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v3
+
+    - uses: conda-incubator/setup-miniconda@v2
       with:
+        activate-environment: freqtrade-conda
         python-version: 3.9
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies
-      run: |
-        conda env update --file environment.yml --name base
-    - name: Lint with black
-      run: |
-        black -l 120 --check .
-    - name: Test with pytest
-      run: |
-        pytest .
+        channels: conda-forge
+        allow-softlinks: true
+        channel-priority: strict
+        show-channel-urls: true
+        use-only-tar-bz2: true
+        auto-update-conda: false
+
+
+    - name: Cache Entire Conda Environment
+      id: cache-env
+      uses: actions/cache@v2
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ${{ env.CONDA }}/envs
+        key:
+          ${{ runner.os }}-conda-environment-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
+
+    - name: Update Conda Environment
+      if: steps.cache-env.outputs.cache-hit != 'true'
+      env:
+        ENVFILE: environment.yml
+      shell: bash -l {0}
+      run: conda env update -n freqtrade-conda -f $ENVFILE
