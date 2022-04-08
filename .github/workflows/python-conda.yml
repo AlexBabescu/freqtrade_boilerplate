@@ -39,3 +39,8 @@ jobs:
         ENVFILE: environment.yml
       shell: bash -l {0}
       run: conda env update -n freqtrade-conda -f $ENVFILE
+
+    - name: Check formatting with black
+      with:
+          activate-environment: freqtrade-conda
+      run: black --line-length=100 --check .
