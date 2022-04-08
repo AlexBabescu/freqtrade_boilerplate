@@ -23,6 +23,7 @@ dependencies:
     - mypy
     - pytest
     - isort
+    - pre-commit
 
     - pip:
         - pandas-ta
