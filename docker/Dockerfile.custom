@@ -1,5 +1,5 @@
 FROM freqtradeorg/freqtrade:stable
 
-COPY --chown=1000:1000  requirements.txt /freqtrade
+COPY requirements.txt /freqtrade
 
 RUN python -m pip install --upgrade pip && pip install --user --no-cache-dir --no-build-isolation -r /freqtrade/requirements.txt
