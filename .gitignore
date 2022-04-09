@@ -129,14 +129,14 @@ dmypy.json
 .pyre/
 
 # Freqtrade
-freqtrade/*.sqlite
-freqtrade/user_data/data/*
-freqtrade/user_data/logs/.git-keep
-freqtrade/user_data/backtest_results/*
-freqtrade/user_data/hyperopt_results/*
-!freqtrade/user_data/data/.git-keep
-!freqtrade/user_data/backtest_results/.git-keep
-!freqtrade/user_data/hyperopt_results/.git-keep
+*.sqlite
+user_data/data/*
+user_data/logs/.git-keep
+user_data/backtest_results/*
+user_data/hyperopt_results/*
+!user_data/data/.git-keep
+!user_data/backtest_results/.git-keep
+!user_data/hyperopt_results/.git-keep
 
 # Editors
 *~

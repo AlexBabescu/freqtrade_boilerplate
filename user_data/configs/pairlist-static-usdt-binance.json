@@ -1,0 +1,48 @@
+{
+    "exchange": {
+        "name": "binance",
+        "pair_whitelist": [
+            "COMP/USDT",
+            "ADA/USDT",
+            "XRP/USDT",
+            "SOL/USDT",
+            "DOT/USDT",
+            "AVAX/USDT",
+            "LINK/USDT",
+            "LTC/USDT",
+            "ALGO/USDT",
+            "ATOM/USDT",
+            "FIL/USDT",
+            "MATIC/USDT",
+            "XLM/USDT",
+            "FTT/USDT",
+            "ETC/USDT",
+            "VET/USDT",
+            "XTZ/USDT",
+            "CAKE/USDT",
+            "EOS/USDT",
+            "XMR/USDT",
+            "AAVE/USDT",
+            "EGLD/USDT",
+            "IOTA/USDT",
+            "NEO/USDT",
+            "KSM/USDT",
+            "UNI/USDT",
+            "DASH/USDT",
+            "ZEC/USDT",
+            "XEM/USDT",
+            "CRV/USDT",
+            "ICX/USDT",
+            "ZIL/USDT",
+            "ZEN/USDT",
+            "RVN/USDT"
+        ]
+    },
+    "pairlists": [
+        {
+            "method": "StaticPairList"
+        }
+	],
+    "dataformat_ohlcv": "jsongz",
+    "dataformat_trades": "jsongz"
+}
