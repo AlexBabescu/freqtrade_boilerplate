@@ -32,6 +32,9 @@ jobs:
 
     - name: Downloading data
       if: steps.cache-download-data.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        clean: true
       run: |
         docker-compose run --rm download-indicator-data
         docker-compose run --rm download-data
