@@ -18,7 +18,7 @@ jobs:
         path: user_data/data
         key: ${{ runner.os }}-download-data-${{ env.CACHE_NUMBER }}-${{ hashFiles('user_data/configs/pairlist-static-usdt-binance.json') }}
 
-    - name: Update Conda Environment
+    - name: Downloading data
       if: steps.cache-download-data.outputs.cache-hit != 'true'
       run: |
         docker-compose run --rm download-indicator-data
