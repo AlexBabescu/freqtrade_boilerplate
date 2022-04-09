@@ -131,12 +131,11 @@ dmypy.json
 # Freqtrade
 *.sqlite
 user_data/data/*
-user_data/logs/.git-keep
 user_data/backtest_results/*
 user_data/hyperopt_results/*
-!user_data/data/.git-keep
-!user_data/backtest_results/.git-keep
-!user_data/hyperopt_results/.git-keep
+!user_data/data/binance/.gitkeep
+!user_data/backtest_results/.gitkeep
+!user_data/hyperopt_results/.gitkeep
 
 # Editors
 *~
