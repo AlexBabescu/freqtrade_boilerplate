@@ -48,3 +48,10 @@ jobs:
     steps:
     - name: Checking code formatting
       run: docker-compose run --rm freqtrade-boilerplate black --line-length 100 -v --check user_data
+
+  run-tests:
+    needs: [check-formatting, download-data]
+    runs-on: self-hosted
+    steps:
+    - name: Run tests
+      run: docker-compose run --rm freqtrade-boilerplate pytest -vv -W ignore::DeprecationWarning /freqtrade/user_data/test
