@@ -30,11 +30,13 @@ jobs:
         path: user_data/data
         key: ${{ runner.os }}-download-data-${{ env.CACHE_NUMBER }}-${{ hashFiles('user_data/configs/pairlist-static-usdt-binance.json') }}
 
-    - name: Downloading data
+    - name: Clean checkout
       if: steps.cache-download-data.outputs.cache-hit != 'true'
       uses: actions/checkout@v3
       with:
         clean: true
+
+    - name: Downloading data
       run: |
         docker-compose run --rm download-indicator-data
         docker-compose run --rm download-data
