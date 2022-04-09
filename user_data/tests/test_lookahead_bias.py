@@ -61,7 +61,7 @@ def test_buy_signals_for_lookahead_bias(strategy, pair, timerange):
     assert len(last_buy_signals) == no_of_signals_to_check
 
     for idx, signal in last_buy_signals.iterrows():
-        # 1000 because that's the number of candles we tipically get in live trading
+        # 1000 because that's the number of candles we typically get in live trading
         assert idx > 1000  # type: ignore
         # Check that the dates match
         assert df.iloc[idx].date == signal.date  # type: ignore
