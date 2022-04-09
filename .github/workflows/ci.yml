@@ -54,4 +54,4 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: Run tests
-      run: docker-compose run --rm freqtrade-boilerplate pytest -vv -W ignore::DeprecationWarning /freqtrade/user_data/test
+      run: docker-compose run --rm freqtrade-boilerplate pytest -vv -W ignore::DeprecationWarning /freqtrade/user_data/tests
