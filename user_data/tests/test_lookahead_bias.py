@@ -4,6 +4,7 @@ import pytest
 from freqtrade.configuration import Configuration, TimeRange
 from freqtrade.data.dataprovider import DataProvider
 from freqtrade.data.history import load_pair_history
+from freqtrade.exchange import Exchange
 from freqtrade.resolvers import StrategyResolver
 
 USER_DATA = Path(__file__).parent.parent
@@ -52,7 +53,7 @@ def test_buy_signals_for_lookahead_bias(strategy, pair, timerange):
     )
 
     strategy = StrategyResolver.load_strategy(CONFIG)
-    strategy.dp = DataProvider(CONFIG, None, None)
+    strategy.dp = DataProvider(CONFIG, Exchange(CONFIG), None)
 
     df = strategy.analyze_ticker(candles, {"pair": pair})
 
