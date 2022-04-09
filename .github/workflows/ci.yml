@@ -37,6 +37,7 @@ jobs:
         clean: true
 
     - name: Downloading data
+      if: steps.cache-download-data.outputs.cache-hit != 'true'
       run: |
         docker-compose run --rm download-indicator-data
         docker-compose run --rm download-data
