@@ -1,15 +1,13 @@
 ---
 version: '3'
 services:
-  check-formatting:
+  freqtrade-boilerplate:
     build:
        context: .
        dockerfile: "./docker/Dockerfile.custom"
     container_name: freqtrade-boilerplate
     volumes:
       - "./user_data:/freqtrade/user_data"
-    command: >
-      python -m black --line-length=100 --check /freqtrade/user_data/
     entrypoint: []
   download-data:
     image: freqtradeorg/freqtrade:stable
