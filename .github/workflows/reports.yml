@@ -10,6 +10,10 @@ jobs:
     name: Run backtest and write report
     runs-on: self-hosted
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
@@ -57,7 +61,7 @@ jobs:
 
           # The message for the commit.
           # Default: 'Commit from GitHub Actions (name of the workflow)'
-          message: "Added backtest for $env:GITHUB_SHA to reports"
+          message: Added backtest for '${{ github.event.pull_request.head.ref }}' to reports
 
           # If this input is set, the action will push the commit to a new branch with this name.
           # Default: ''
