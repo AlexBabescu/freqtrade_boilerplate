@@ -23,6 +23,9 @@ jobs:
         run: echo '${{ toJSON(strategy) }}'
       - name: Dump matrix context
         run: echo '${{ toJSON(matrix) }}'
+      - name: Set outputs
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
@@ -70,7 +73,7 @@ jobs:
 
           # The message for the commit.
           # Default: 'Commit from GitHub Actions (name of the workflow)'
-          message: Added backtest for '${{ github.sha }}' to reports
+          message: Added backtest for '${{ steps.vars.outputs.sha_short }}' to reports
 
           # If this input is set, the action will push the commit to a new branch with this name.
           # Default: ''
