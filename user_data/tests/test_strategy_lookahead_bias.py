@@ -55,7 +55,7 @@ def test_buy_signals_for_lookahead_bias(strategy, pair, timerange):
     strategy = StrategyResolver.load_strategy(CONFIG)
     strategy.dp = DataProvider(CONFIG, Exchange(CONFIG), None)
 
-    df = strategy.analyze_ticker(candles, {"pair": pair})
+    df = strategy.analyze_ticker(candles.copy(), {"pair": pair})
 
     last_buy_signals = df[df["buy"] == 1][["date"]].tail(no_of_signals_to_check).copy()
 
@@ -70,7 +70,7 @@ def test_buy_signals_for_lookahead_bias(strategy, pair, timerange):
 
         # Get the slice of the dataframe that generated the signal
         signal_df = df.iloc[idx - 999 : idx + 1].copy()  # type: ignore
-        signal_df = signal_df[["date", "open", "high", "low", "close", "volume"]]
+        signal_df = signal_df[["date", "open", "high", "low", "close", "volume"]].reset_index()
 
         # Reapply the strategy on the signal slice
         signal_df = strategy.analyze_ticker(signal_df, {"pair": pair})
