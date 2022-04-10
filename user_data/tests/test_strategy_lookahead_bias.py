@@ -82,3 +82,7 @@ def test_buy_signals_for_lookahead_bias(strategy, pair, timerange):
             raise LookaheadBiasException(
                 f"Strategy {strategy} failed to generate a buy at {signal.date}. Lookahead bias?"
             )
+
+
+if __name__ == "__main__":
+    pytest.main(["-s", __file__])
