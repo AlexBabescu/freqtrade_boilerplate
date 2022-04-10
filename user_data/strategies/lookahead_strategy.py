@@ -2,6 +2,7 @@ from functools import reduce
 
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import talib.abstract as ta
+from freqtrade.strategy import merge_informative_pair
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 
@@ -45,7 +46,21 @@ class LookaheadStrategy(IStrategy):
     timeframe = "5m"
     # #################### END OF RESULT PLACE ####################
 
+    def informative_1h_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        assert self.dp, "DataProvider is required for multiple timeframes."
+        # Get the informative pair
+        informative_1h = self.dp.get_pair_dataframe(pair=metadata["pair"], timeframe="1h")
+        # EMA
+        informative_1h["ema_50"] = ta.EMA(informative_1h, timeperiod=50)
+
+        return informative_1h
+
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        informative_1h = self.informative_1h_indicators(dataframe, metadata)
+        dataframe = merge_informative_pair(
+            dataframe, informative_1h, self.timeframe, "1h", ffill=True
+        )
+
         dataframe["buy_ema_fast"] = ta.SMA(dataframe, timeperiod=self.buy_params["buy_fast"])
         dataframe["buy_ema_slow"] = ta.SMA(dataframe, timeperiod=self.buy_params["buy_slow"])
 
@@ -64,6 +79,7 @@ class LookaheadStrategy(IStrategy):
                 dataframe["buy_ema_slow"].shift(self.buy_params["buy_shift"])
                 * self.buy_params["buy_push"],
             )
+            & (dataframe["close"] > dataframe["ema_50_1h"])
         )
 
         if conditions:

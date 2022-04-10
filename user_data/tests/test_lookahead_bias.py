@@ -24,18 +24,18 @@ class LookaheadBiasException(Exception):
 @pytest.mark.parametrize(
     "strategy,pair,timerange",
     [
-        ("SampleStrategy", "COMP/USDT", "20211201-20211231"),
-        ("SampleStrategy", "ADA/USDT", "20211001-20211231"),
+        ("SampleStrategy", "COMP/USDT", "20210601-20211231"),
+        ("SampleStrategy", "ADA/USDT", "20210601-20211231"),
         pytest.param(
             "LookaheadStrategy",
             "COMP/USDT",
-            "20211201-20211231",
+            "20210601-20211231",
             marks=pytest.mark.xfail(raises=LookaheadBiasException),
         ),
         pytest.param(
             "LookaheadStrategy",
             "ADA/USDT",
-            "20210101-20211231",
+            "20210601-20211231",
             marks=pytest.mark.xfail(raises=LookaheadBiasException),
         ),
     ],
@@ -64,10 +64,14 @@ def test_buy_signals_for_lookahead_bias(strategy, pair, timerange):
     for idx, signal in last_buy_signals.iterrows():
         # 1000 because that's the number of candles we typically get in live trading
         assert idx > 1000  # type: ignore
+
         # Check that the dates match
         assert df.iloc[idx].date == signal.date  # type: ignore
+
         # Get the slice of the dataframe that generated the signal
         signal_df = df.iloc[idx - 999 : idx + 1].copy()  # type: ignore
+        signal_df = signal_df[["date", "open", "high", "low", "close", "volume"]]
+
         # Reapply the strategy on the signal slice
         signal_df = strategy.analyze_ticker(signal_df, {"pair": pair})
 
