@@ -93,5 +93,6 @@ def test_indicator_for_lookahead_bias(indicator_df, indicator_fn, startup_candle
                 f"Indicator {request.node.callspec.id} failed to replicate dataframe. Lookahead bias?"
             )
 
+
 if __name__ == "__main__":
     pytest.main(["-s", __file__])
