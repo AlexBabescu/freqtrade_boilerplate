@@ -73,7 +73,7 @@ jobs:
 
           # The message for the commit.
           # Default: 'Commit from GitHub Actions (name of the workflow)'
-          message: Added backtest for '${{ steps.vars.outputs.sha_short }}' to reports
+          message: Added backtest for ${{ steps.vars.outputs.sha_short }} to reports
 
           # If this input is set, the action will push the commit to a new branch with this name.
           # Default: ''
