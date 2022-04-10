@@ -3,57 +3,57 @@ name: CI
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   build-docker:
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v3
-      with:
-        clean: false
-    - name: Build the Docker image
-      run: docker-compose build
+      - uses: actions/checkout@v3
+        with:
+          clean: false
+      - name: Build the Docker image
+        run: docker-compose build
 
   download-data:
     needs: build-docker
     runs-on: self-hosted
 
     steps:
-    - name: Cache download-data
-      id: cache-download-data
-      uses: actions/cache@v3
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: user_data/data
-        key: ${{ runner.os }}-download-data-${{ env.CACHE_NUMBER }}-${{ hashFiles('user_data/configs/pairlist-static-usdt-binance.json') }}
+      - name: Cache download-data
+        id: cache-download-data
+        uses: actions/cache@v3
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: user_data/data
+          key: ${{ runner.os }}-download-data-${{ env.CACHE_NUMBER }}-${{ hashFiles('user_data/configs/pairlist-static-usdt-binance.json') }}
 
-    - name: Clean checkout
-      if: steps.cache-download-data.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
-      with:
-        clean: true
+      - name: Clean checkout
+        if: steps.cache-download-data.outputs.cache-hit != 'true'
+        uses: actions/checkout@v3
+        with:
+          clean: true
 
-    - name: Downloading data
-      if: steps.cache-download-data.outputs.cache-hit != 'true'
-      run: |
-        docker-compose run --rm download-indicator-data
-        docker-compose run --rm download-data
+      - name: Downloading data
+        if: steps.cache-download-data.outputs.cache-hit != 'true'
+        run: |
+          docker-compose run --rm download-indicator-data
+          docker-compose run --rm download-data
 
   check-formatting:
     needs: build-docker
     runs-on: self-hosted
     steps:
-    - name: Checking code formatting
-      run: docker-compose run --rm freqtrade-boilerplate black --line-length 100 -v --check user_data
+      - name: Checking code formatting
+        run: docker-compose run --rm freqtrade-boilerplate black --line-length 100 -v --check user_data
 
   run-tests:
     needs: [check-formatting, download-data]
     runs-on: self-hosted
     steps:
-    - name: Run tests
-      run: docker-compose run --rm freqtrade-boilerplate pytest -vv -W ignore::DeprecationWarning /freqtrade/user_data/tests
+      - name: Run tests
+        run: docker-compose run --rm freqtrade-boilerplate pytest -vv -W ignore::DeprecationWarning /freqtrade/user_data/tests
