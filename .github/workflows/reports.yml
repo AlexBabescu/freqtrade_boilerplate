@@ -10,19 +10,19 @@ jobs:
     name: Run backtest and write report
     runs-on: self-hosted
     steps:
-      - name: Dump GitHub context
-        id: github_context_step
-        run: echo '${{ toJSON(github) }}'
-      - name: Dump job context
-        run: echo '${{ toJSON(job) }}'
-      - name: Dump steps context
-        run: echo '${{ toJSON(steps) }}'
-      - name: Dump runner context
-        run: echo '${{ toJSON(runner) }}'
-      - name: Dump strategy context
-        run: echo '${{ toJSON(strategy) }}'
-      - name: Dump matrix context
-        run: echo '${{ toJSON(matrix) }}'
+      # - name: Dump GitHub context
+      #   id: github_context_step
+      #   run: echo '${{ toJSON(github) }}'
+      # - name: Dump job context
+      #   run: echo '${{ toJSON(job) }}'
+      # - name: Dump steps context
+      #   run: echo '${{ toJSON(steps) }}'
+      # - name: Dump runner context
+      #   run: echo '${{ toJSON(runner) }}'
+      # - name: Dump strategy context
+      #   run: echo '${{ toJSON(strategy) }}'
+      # - name: Dump matrix context
+      #   run: echo '${{ toJSON(matrix) }}'
       - name: Set outputs
         id: vars
         run: echo "::set-output name=sha_short::$(git rev-parse --short "$GITHUB_SHA")"
