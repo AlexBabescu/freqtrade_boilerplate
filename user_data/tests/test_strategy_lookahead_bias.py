@@ -26,6 +26,7 @@ class LookaheadBiasException(Exception):
     [
         ("SampleStrategy", "COMP/USDT", "20210601-20211231"),
         ("SampleStrategy", "ADA/USDT", "20210601-20211231"),
+        ("NASOSv4", "ADA/USDT", "20210601-20211231"),
         pytest.param(
             "LookaheadStrategy",
             "COMP/USDT",
