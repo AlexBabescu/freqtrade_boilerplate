@@ -25,14 +25,14 @@ jobs:
         run: echo '${{ toJSON(matrix) }}'
       - name: Set outputs
         id: vars
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: echo "::set-output name=sha_short::$(git rev-parse --short "$GITHUB_SHA")"
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           clean: false
       - name: Write report
         run: |
-          echo -e "$(git rev-parse --short "$GITHUB_SHA")\n" >> ./reports/report.txt
+          echo -e "${{ steps.vars.outputs.sha_short }}\n" >> ./reports/report.txt
       - name: Commit and push report
         uses: EndBug/add-and-commit@v9 # You can change this to use a specific version.
         with:
