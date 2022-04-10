@@ -1,0 +1,69 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "internalConsole",
+            "justMyCode": false
+        },
+        {
+            "name": "dryrun",
+            "type": "python",
+            "request": "launch",
+            "module": "freqtrade",
+            "args": [
+                "trade",
+                "--config",
+                "./user_data/data/config-usdt-binance.json",
+                "--config",
+                "./user_data/data/pairlist-static-usdt-binance.json",
+                "--config",
+                "./user_data/data/blacklist-binance",
+                "--strategy",
+                "SampleStrategy"
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "backtesting multiple strategies 1h",
+            "type": "python",
+            "request": "launch",
+            "module": "freqtrade",
+            "args": [
+                "backtesting",
+                "--timeframe=1h",
+                "--timerange=20210601-20210701",
+                "--max-open-trades=5",
+                "--stake-amount=200",
+                "--config",
+                "./user_data/data/config-usdt-binance.json",
+                "--config",
+                "./user_data/data/pairlist-static-usdt-binance.json",
+                "--config",
+                "./user_data/data/blacklist-binance",
+                "--strategy-list",
+                "SampleStrategy"
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "webserver backtesting",
+            "type": "python",
+            "request": "launch",
+            "module": "freqtrade",
+            "args": [
+                "webserver",
+                "--config",
+                "./user_data/data/config-usdt-binance.json",
+                "--config",
+                "./user_data/data/pairlist-static-usdt-binance.json",
+                "--config",
+                "./user_data/data/blacklist-binance"
+            ],
+            "justMyCode": false
+        }
+    ]
+}
