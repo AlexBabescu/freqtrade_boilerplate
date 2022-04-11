@@ -17,11 +17,11 @@
             "args": [
                 "trade",
                 "--config",
-                "./user_data/data/config-usdt-binance.json",
+                "./user_data/configs/config-usdt-binance.json",
                 "--config",
-                "./user_data/data/pairlist-static-usdt-binance.json",
+                "./user_data/configs/pairlist-static-usdt-binance.json",
                 "--config",
-                "./user_data/data/blacklist-binance",
+                "./user_data/configs/blacklist-binance.json",
                 "--strategy",
                 "SampleStrategy"
             ],
@@ -39,11 +39,11 @@
                 "--max-open-trades=5",
                 "--stake-amount=200",
                 "--config",
-                "./user_data/data/config-usdt-binance.json",
+                "./user_data/configs/config-usdt-binance.json",
                 "--config",
-                "./user_data/data/pairlist-static-usdt-binance.json",
+                "./user_data/configs/pairlist-static-usdt-binance.json",
                 "--config",
-                "./user_data/data/blacklist-binance",
+                "./user_data/configs/blacklist-binance.json",
                 "--strategy-list",
                 "SampleStrategy"
             ],
@@ -57,11 +57,11 @@
             "args": [
                 "webserver",
                 "--config",
-                "./user_data/data/config-usdt-binance.json",
+                "./user_data/configs/config-usdt-binance.json",
                 "--config",
-                "./user_data/data/pairlist-static-usdt-binance.json",
+                "./user_data/configs/pairlist-static-usdt-binance.json",
                 "--config",
-                "./user_data/data/blacklist-binance"
+                "./user_data/configs/blacklist-binance.json"
             ],
             "justMyCode": false
         }

@@ -30,13 +30,13 @@ class LookaheadBiasException(Exception):
             "LookaheadStrategy",
             "COMP/USDT",
             "20210601-20211231",
-            marks=pytest.mark.xfail(raises=LookaheadBiasException),
+            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
         ),
         pytest.param(
             "LookaheadStrategy",
             "ADA/USDT",
             "20210601-20211231",
-            marks=pytest.mark.xfail(raises=LookaheadBiasException),
+            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
         ),
     ],
 )
@@ -57,25 +57,30 @@ def test_buy_signals_for_lookahead_bias(strategy, pair, timerange):
 
     df = strategy.analyze_ticker(candles.copy(), {"pair": pair})
 
-    last_buy_signals = df[df["buy"] == 1][["date"]].tail(no_of_signals_to_check).copy()
+    col = ["date", "buy"]
+    if "buy_tag" in df.columns:
+        col += ["buy_tag"]
+
+    last_buy_signals = df[df["buy"] == 1][col].tail(no_of_signals_to_check).copy()
 
     assert len(last_buy_signals) == no_of_signals_to_check
 
     for idx, signal in last_buy_signals.iterrows():
-        # 1000 because that's the number of candles we typically get in live trading
-        assert idx > 1000  # type: ignore
+        # 999 because that's the number of candles we typically get in live trading
+        assert idx > 999  # type: ignore
 
         # Check that the dates match
         assert df.iloc[idx].date == signal.date  # type: ignore
 
         # Get the slice of the dataframe that generated the signal
-        signal_df = df.iloc[idx - 999 : idx + 1].copy()  # type: ignore
-        signal_df = signal_df[["date", "open", "high", "low", "close", "volume"]].reset_index()
+        # This is equivalent to the dataframe we received from the exchange
+        exchange_df = df.iloc[idx - 998 : idx + 1].copy()  # type: ignore
+        exchange_df = exchange_df[["date", "open", "high", "low", "close", "volume"]].reset_index().drop(columns=['index'])
 
         # Reapply the strategy on the signal slice
-        signal_df = strategy.analyze_ticker(signal_df, {"pair": pair})
+        analyzed_df = strategy.analyze_ticker(exchange_df.copy(), {"pair": pair})
 
-        new_signal = signal_df[signal_df["date"] == signal.date]
+        new_signal = analyzed_df[analyzed_df["date"] == signal.date]
 
         # Check that the signal is still a buy signal
         if new_signal.iloc[0].buy != 1:

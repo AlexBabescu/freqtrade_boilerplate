@@ -68,7 +68,7 @@ dataframe = load_pair_history(
                 displacement=30,
             )["chikou_span"],
             30,
-            marks=pytest.mark.xfail(raises=LookaheadBiasException),
+            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
             id="technical.indicators.ichimoku",
         ),
     ],
