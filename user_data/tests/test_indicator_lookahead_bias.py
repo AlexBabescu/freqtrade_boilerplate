@@ -34,6 +34,13 @@ dataframe = load_pair_history(
     data_format="jsongz",
 )
 
+def EWO(dataframe, ema_length=5, ema2_length=35):
+    df = dataframe.copy()
+    ema1 = ta.EMA(df, timeperiod=ema_length)
+    ema2 = ta.EMA(df, timeperiod=ema2_length)
+    emadif = (ema1 - ema2) / df['low'] * 100
+    return emadif
+
 
 @pytest.mark.parametrize(
     "indicator_df,indicator_fn,startup_candles",
@@ -41,7 +48,7 @@ dataframe = load_pair_history(
         pytest.param(
             ta.EMA(dataframe, timeperiod=26),
             lambda dataframe: ta.EMA(dataframe, timeperiod=26),
-            26,
+            400,
             id="ta.EMA",
         ),
         pytest.param(
@@ -49,8 +56,15 @@ dataframe = load_pair_history(
             lambda dataframe: qtpylib.bollinger_bands(
                 qtpylib.typical_price(dataframe), window=20, stds=2
             )["mid"],
-            20,
+            400,
             id="qtpylib.bollinger_bands",
+        ),
+        pytest.param(
+            EWO(dataframe, 50, 200),
+            lambda dataframe: EWO(dataframe, 50, 200),
+            400,
+            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
+            id="EWO",
         ),
         pytest.param(
             ichimoku(
@@ -67,7 +81,7 @@ dataframe = load_pair_history(
                 laggin_span=120,
                 displacement=30,
             )["chikou_span"],
-            30,
+            400,
             marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
             id="technical.indicators.ichimoku",
         ),
