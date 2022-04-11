@@ -90,20 +90,23 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
 )
 def test_indicator_for_lookahead_bias(indicator_df, indicator_fn, startup_candles, request):
 
-    window = 1000
+    # Number of candles to typically get from the exchange
+    window = 999
     assert startup_candles < window, "Startup candles should be less than window"
 
     end = len(dataframe) - len(dataframe) % window
 
     for idx in range(window, end, window):
         df_slice = dataframe.iloc[idx - window : idx].copy()  # type: ignore
-        indicator_slice = indicator_fn(df_slice)
+        full_indicator_slice = indicator_fn(df_slice)
 
         # We need to remove the startup_candles from the slice
         # This is because some indicators will need N number of candles before they start to work
-        indicator_slice = indicator_slice.iloc[idx - window - startup_candles : idx]
+        indicator_slice = full_indicator_slice.loc[idx - window + startup_candles : idx].copy()
 
-        if not np.allclose(indicator_df.iloc[indicator_slice.index], indicator_slice):
+        assert len(indicator_slice) == window - startup_candles
+
+        if not np.allclose(indicator_df.loc[indicator_slice.index], indicator_slice):
             raise LookaheadBiasException(
                 f"Indicator {request.node.callspec.id} failed to replicate dataframe. Lookahead bias?"
             )
