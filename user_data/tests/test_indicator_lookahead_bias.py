@@ -34,11 +34,12 @@ dataframe = load_pair_history(
     data_format="jsongz",
 )
 
+
 def EWO(dataframe, ema_length=5, ema2_length=35):
     df = dataframe.copy()
     ema1 = ta.EMA(df, timeperiod=ema_length)
     ema2 = ta.EMA(df, timeperiod=ema2_length)
-    emadif = (ema1 - ema2) / df['low'] * 100
+    emadif = (ema1 - ema2) / df["low"] * 100
     return emadif
 
 

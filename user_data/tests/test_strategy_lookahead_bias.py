@@ -75,7 +75,11 @@ def test_buy_signals_for_lookahead_bias(strategy, pair, timerange):
         # Get the slice of the dataframe that generated the signal
         # This is equivalent to the dataframe we received from the exchange
         exchange_df = df.iloc[idx - 998 : idx + 1].copy()  # type: ignore
-        exchange_df = exchange_df[["date", "open", "high", "low", "close", "volume"]].reset_index().drop(columns=['index'])
+        exchange_df = (
+            exchange_df[["date", "open", "high", "low", "close", "volume"]]
+            .reset_index()
+            .drop(columns=["index"])
+        )
 
         # Reapply the strategy on the signal slice
         analyzed_df = strategy.analyze_ticker(exchange_df.copy(), {"pair": pair})
