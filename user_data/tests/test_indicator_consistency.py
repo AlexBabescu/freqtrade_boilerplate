@@ -1,3 +1,4 @@
+# pylint: disable=pointless-string-statement
 from pathlib import Path
 
 import freqtrade.vendor.qtpylib.indicators as qtpylib
@@ -8,8 +9,45 @@ from freqtrade.configuration import Configuration, TimeRange
 from freqtrade.data.history import load_pair_history
 from technical.indicators import ichimoku
 
+"""
+Test for indicator consistency
 
-class LookaheadBiasException(Exception):
+This test is to verify that the a indicator is the same for a given pair when
+calculated over a large dataframe (like we do in backtesting)
+and when calculated over a small dataframe (like we do in live trading).
+
+For example:
+Imaging we have a large dataframe with 10000 candles and a small dataframe with 999 candles.
+                                             A
+                                     1000--------1999
+                                     |              |
+          0                                                                    10000
+indicator(.....................................................................)
+                                              |     |
+                                              -------
+                                                 C
+
+                  B
+          1000--------1999
+          |              |
+indicator(................)
+                   |     |
+                   -------
+                      D
+
+
+len(A) == len(B) == 999
+len(C) == len(D) == no_of_last_candles_to_compare
+
+A is calculated over a large dataframe then sliced out
+B is calculated over a small dataframe.
+
+
+We then compare C and D and raise an exception if they are not the same (within 1.0e-5 tolerance)
+"""
+
+
+class ConsistencyException(Exception):
     pass
 
 
@@ -44,47 +82,40 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
 
 
 @pytest.mark.parametrize(
-    "indicator_df,indicator_fn,startup_candles",
+    "indicator_df,indicator_fn",
     [
         pytest.param(
             qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)["mid"],
             lambda dataframe: qtpylib.bollinger_bands(
                 qtpylib.typical_price(dataframe), window=20, stds=2
             )["mid"],
-            400,
             id="qtpylib.bollinger_bands",
         ),
         pytest.param(
             ta.EMA(dataframe, timeperiod=26),
             lambda dataframe: ta.EMA(dataframe, timeperiod=26),
-            400,
             id="ta.EMA 26",
         ),
         pytest.param(
-            ta.EMA(dataframe, timeperiod=95),
-            lambda dataframe: ta.EMA(dataframe, timeperiod=95),
-            400,
-            id="ta.EMA 95",
+            ta.EMA(dataframe, timeperiod=182),
+            lambda dataframe: ta.EMA(dataframe, timeperiod=182),
+            id="ta.EMA 182",
         ),
         pytest.param(
-            ta.EMA(dataframe, timeperiod=96),
-            lambda dataframe: ta.EMA(dataframe, timeperiod=96),
-            400,
-            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
-            id="ta.EMA 96",
+            ta.EMA(dataframe, timeperiod=183),
+            lambda dataframe: ta.EMA(dataframe, timeperiod=183),
+            marks=pytest.mark.xfail(raises=ConsistencyException, strict=True),
+            id="ta.EMA 183",
         ),
         pytest.param(
             EWO(dataframe, 20, 90),
             lambda dataframe: EWO(dataframe, 20, 90),
-            400,
-            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
             id="EWO 20 90",
         ),
         pytest.param(
             EWO(dataframe, 50, 200),
             lambda dataframe: EWO(dataframe, 50, 200),
-            400,
-            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
+            marks=pytest.mark.xfail(raises=ConsistencyException, strict=True),
             id="EWO 50 200",
         ),
         pytest.param(
@@ -102,17 +133,17 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
                 laggin_span=120,
                 displacement=30,
             )["chikou_span"],
-            400,
-            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
+            marks=pytest.mark.xfail(raises=ConsistencyException, strict=True),
             id="technical.indicators.ichimoku",
         ),
     ],
 )
-def test_indicator_for_lookahead_bias(indicator_df, indicator_fn, startup_candles, request):
+def test_indicator_for_consistency(indicator_df, indicator_fn, request):
 
     # Number of candles to typically get from the exchange
     window = 999
-    assert startup_candles < window, "Startup candles should be less than window"
+
+    no_of_last_candles_to_compare = 200
 
     end = len(dataframe) - len(dataframe) % window
 
@@ -123,17 +154,17 @@ def test_indicator_for_lookahead_bias(indicator_df, indicator_fn, startup_candle
 
         # We need to remove the startup_candles from the slice
         # This is because some indicators will need N number of candles before they start to work
-        indicator_slice = full_indicator_slice.loc[idx - window + startup_candles : idx].copy()
+        indicator_slice = full_indicator_slice.loc[idx - no_of_last_candles_to_compare : idx].copy()
 
         assert (
-            len(indicator_slice) == window - startup_candles
-        ), f"Slice should be of length {window - startup_candles}"
+            len(indicator_slice) == no_of_last_candles_to_compare
+        ), f"Indicator slice should be of length {no_of_last_candles_to_compare}"
 
         if not np.allclose(
             indicator_df.loc[indicator_slice.index], indicator_slice, rtol=1.0e-5, atol=1.0e-5
         ):
-            raise LookaheadBiasException(
-                f"Indicator {request.node.callspec.id} failed to replicate dataframe. Lookahead bias?"
+            raise ConsistencyException(
+                f"Indicator {request.node.callspec.id} failed to replicate dataframe."
             )
 
 
