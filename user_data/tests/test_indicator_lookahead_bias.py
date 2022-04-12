@@ -61,17 +61,17 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
             id="ta.EMA 26",
         ),
         pytest.param(
-            ta.EMA(dataframe, timeperiod=92),
-            lambda dataframe: ta.EMA(dataframe, timeperiod=92),
+            ta.EMA(dataframe, timeperiod=95),
+            lambda dataframe: ta.EMA(dataframe, timeperiod=95),
             400,
-            id="ta.EMA 92",
+            id="ta.EMA 95",
         ),
         pytest.param(
-            ta.EMA(dataframe, timeperiod=93),
-            lambda dataframe: ta.EMA(dataframe, timeperiod=93),
+            ta.EMA(dataframe, timeperiod=96),
+            lambda dataframe: ta.EMA(dataframe, timeperiod=96),
             400,
             marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
-            id="ta.EMA 93",
+            id="ta.EMA 96",
         ),
         pytest.param(
             EWO(dataframe, 20, 90),
@@ -129,7 +129,7 @@ def test_indicator_for_lookahead_bias(indicator_df, indicator_fn, startup_candle
             len(indicator_slice) == window - startup_candles
         ), f"Slice should be of length {window - startup_candles}"
 
-        if not np.allclose(indicator_df.loc[indicator_slice.index], indicator_slice):
+        if not np.allclose(indicator_df.loc[indicator_slice.index], indicator_slice, rtol=1.e-5, atol=1.e-5):
             raise LookaheadBiasException(
                 f"Indicator {request.node.callspec.id} failed to replicate dataframe. Lookahead bias?"
             )
