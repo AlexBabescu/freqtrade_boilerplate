@@ -47,12 +47,6 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
     "indicator_df,indicator_fn,startup_candles",
     [
         pytest.param(
-            ta.EMA(dataframe, timeperiod=26),
-            lambda dataframe: ta.EMA(dataframe, timeperiod=26),
-            400,
-            id="ta.EMA",
-        ),
-        pytest.param(
             qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)["mid"],
             lambda dataframe: qtpylib.bollinger_bands(
                 qtpylib.typical_price(dataframe), window=20, stds=2
@@ -61,11 +55,37 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
             id="qtpylib.bollinger_bands",
         ),
         pytest.param(
+            ta.EMA(dataframe, timeperiod=26),
+            lambda dataframe: ta.EMA(dataframe, timeperiod=26),
+            400,
+            id="ta.EMA 26",
+        ),
+        pytest.param(
+            ta.EMA(dataframe, timeperiod=92),
+            lambda dataframe: ta.EMA(dataframe, timeperiod=92),
+            400,
+            id="ta.EMA 92",
+        ),
+        pytest.param(
+            ta.EMA(dataframe, timeperiod=93),
+            lambda dataframe: ta.EMA(dataframe, timeperiod=93),
+            400,
+            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
+            id="ta.EMA 93",
+        ),
+        pytest.param(
+            EWO(dataframe, 20, 90),
+            lambda dataframe: EWO(dataframe, 20, 90),
+            400,
+            marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
+            id="EWO 20 90",
+        ),
+        pytest.param(
             EWO(dataframe, 50, 200),
             lambda dataframe: EWO(dataframe, 50, 200),
             400,
             marks=pytest.mark.xfail(raises=LookaheadBiasException, strict=True),
-            id="EWO",
+            id="EWO 50 200",
         ),
         pytest.param(
             ichimoku(
@@ -98,13 +118,16 @@ def test_indicator_for_lookahead_bias(indicator_df, indicator_fn, startup_candle
 
     for idx in range(window, end, window):
         df_slice = dataframe.iloc[idx - window : idx].copy()  # type: ignore
+        assert len(df_slice) == window, f"Slice should be of length {window}"
         full_indicator_slice = indicator_fn(df_slice)
 
         # We need to remove the startup_candles from the slice
         # This is because some indicators will need N number of candles before they start to work
         indicator_slice = full_indicator_slice.loc[idx - window + startup_candles : idx].copy()
 
-        assert len(indicator_slice) == window - startup_candles
+        assert (
+            len(indicator_slice) == window - startup_candles
+        ), f"Slice should be of length {window - startup_candles}"
 
         if not np.allclose(indicator_df.loc[indicator_slice.index], indicator_slice):
             raise LookaheadBiasException(
