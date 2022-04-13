@@ -1,23 +1,10 @@
 from datetime import datetime, timezone
-from pathlib import Path
 
 import pytest
-from freqtrade.configuration import Configuration, TimeRange
 from freqtrade.data.dataprovider import DataProvider
 from freqtrade.data.history import load_pair_history
 from freqtrade.exchange import Exchange
 from freqtrade.resolvers import StrategyResolver
-
-USER_DATA = Path(__file__).parent.parent
-
-CONFIG = Configuration.from_files(
-    [
-        str(USER_DATA / "configs" / "config-usdt-binance.json"),
-        str(USER_DATA / "configs" / "pairlist-static-usdt-binance.json"),
-    ]
-)
-
-DATA_TIMERANGE = TimeRange.parse_timerange("20210101-20211231")
 
 
 class BTCDropProtectionException(Exception):
@@ -48,17 +35,17 @@ class BTCDropProtectionException(Exception):
     ],
 )
 def test_btc_drop_protection(strategy, pair, btc_drop_timerange):
-    CONFIG["strategy"] = strategy
+    pytest.config["strategy"] = strategy
     candles = load_pair_history(
-        datadir=USER_DATA / "data" / CONFIG["exchange"]["name"],
-        timeframe=CONFIG["timeframe"],
-        timerange=DATA_TIMERANGE,
+        datadir=pytest.user_data / "data" / pytest.config["exchange"]["name"],
+        timeframe=pytest.config["timeframe"],
+        timerange=pytest.data_timerange,
         pair=pair,
         data_format="jsongz",
     )
 
-    strategy = StrategyResolver.load_strategy(CONFIG)
-    strategy.dp = DataProvider(CONFIG, Exchange(CONFIG), None)
+    strategy = StrategyResolver.load_strategy(pytest.config)
+    strategy.dp = DataProvider(pytest.config, Exchange(pytest.config), None)
 
     df = strategy.analyze_ticker(candles.copy(), {"pair": pair})
 

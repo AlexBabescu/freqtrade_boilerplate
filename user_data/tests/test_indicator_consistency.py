@@ -1,11 +1,8 @@
 # pylint: disable=pointless-string-statement
-from pathlib import Path
-
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
 import pytest
 import talib.abstract as ta
-from freqtrade.configuration import Configuration, TimeRange
 from freqtrade.data.history import load_pair_history
 from technical.indicators import ichimoku
 
@@ -51,23 +48,12 @@ class ConsistencyException(Exception):
     pass
 
 
-USER_DATA = Path(__file__).parent.parent
-
-CONFIG = Configuration.from_files(
-    [
-        str(USER_DATA / "configs" / "config-usdt-binance.json"),
-        str(USER_DATA / "configs" / "pairlist-static-usdt-binance.json"),
-    ]
-)
-
-timerange = "20210601-20211231"
 pair = "ADA/USDT"
 
-time_range = TimeRange.parse_timerange(timerange)
 dataframe = load_pair_history(
-    datadir=USER_DATA / "data" / CONFIG["exchange"]["name"],
-    timeframe=CONFIG["timeframe"],
-    timerange=time_range,
+    datadir=pytest.user_data / "data" / pytest.config["exchange"]["name"],
+    timeframe=pytest.config["timeframe"],
+    timerange=pytest.data_timerange,
     pair=pair,
     data_format="jsongz",
 )
@@ -95,11 +81,6 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
             ta.EMA(dataframe, timeperiod=26),
             lambda dataframe: ta.EMA(dataframe, timeperiod=26),
             id="ta.EMA 26",
-        ),
-        pytest.param(
-            ta.EMA(dataframe, timeperiod=182),
-            lambda dataframe: ta.EMA(dataframe, timeperiod=182),
-            id="ta.EMA 182",
         ),
         pytest.param(
             ta.EMA(dataframe, timeperiod=183),
@@ -161,7 +142,10 @@ def test_indicator_for_consistency(indicator_df, indicator_fn, request):
         ), f"Indicator slice should be of length {no_of_last_candles_to_compare}"
 
         if not np.allclose(
-            indicator_df.loc[indicator_slice.index], indicator_slice, rtol=1.0e-5, atol=1.0e-5
+            indicator_df.loc[indicator_slice.index],
+            indicator_slice,
+            rtol=1.0e-5,
+            atol=1.0e-5,
         ):
             raise ConsistencyException(
                 f"Indicator {request.node.callspec.id} failed to replicate dataframe."
