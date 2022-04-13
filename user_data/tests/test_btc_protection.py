@@ -50,9 +50,7 @@ def test_btc_drop_protection(strategy, pair, btc_drop_timerange):
     df = strategy.analyze_ticker(candles.copy(), {"pair": pair})
 
     for _, row in df.iterrows():
-        if time_in_range(
-            btc_drop_timerange[0], btc_drop_timerange[1], row["date"].to_pydatetime()
-        ):
+        if time_in_range(btc_drop_timerange[0], btc_drop_timerange[1], row["date"].to_pydatetime()):
             if row["buy"] != 0:
                 raise BTCDropProtectionException("BTC drop protection failed")
 

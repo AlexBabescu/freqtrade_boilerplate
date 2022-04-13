@@ -71,9 +71,7 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
     "indicator_df,indicator_fn",
     [
         pytest.param(
-            qtpylib.bollinger_bands(
-                qtpylib.typical_price(dataframe), window=20, stds=2
-            )["mid"],
+            qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)["mid"],
             lambda dataframe: qtpylib.bollinger_bands(
                 qtpylib.typical_price(dataframe), window=20, stds=2
             )["mid"],
@@ -91,9 +89,7 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
             id="ta.EMA 183",
         ),
         pytest.param(
-            EWO(dataframe, 20, 90),
-            lambda dataframe: EWO(dataframe, 20, 90),
-            id="EWO 20 90",
+            EWO(dataframe, 20, 90), lambda dataframe: EWO(dataframe, 20, 90), id="EWO 20 90",
         ),
         pytest.param(
             EWO(dataframe, 50, 200),
@@ -137,19 +133,14 @@ def test_indicator_for_consistency(indicator_df, indicator_fn, request):
 
         # We need to remove the startup_candles from the slice
         # This is because some indicators will need N number of candles before they start to work
-        indicator_slice = full_indicator_slice.loc[
-            idx - no_of_last_candles_to_compare : idx
-        ].copy()
+        indicator_slice = full_indicator_slice.loc[idx - no_of_last_candles_to_compare : idx].copy()
 
         assert (
             len(indicator_slice) == no_of_last_candles_to_compare
         ), f"Indicator slice should be of length {no_of_last_candles_to_compare}"
 
         if not np.allclose(
-            indicator_df.loc[indicator_slice.index],
-            indicator_slice,
-            rtol=1.0e-5,
-            atol=1.0e-5,
+            indicator_df.loc[indicator_slice.index], indicator_slice, rtol=1.0e-5, atol=1.0e-5,
         ):
             raise ConsistencyException(
                 f"Indicator {request.node.callspec.id} failed to replicate dataframe."
