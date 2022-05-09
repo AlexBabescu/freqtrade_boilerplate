@@ -9,13 +9,13 @@
     "dry_run_wallet": 1000,
     "cancel_open_orders_on_exit": false,
     "unfilledtimeout": {
-        "buy": 10,
-        "sell": 30,
+        "entry": 10,
+        "exit": 30,
         "unit": "minutes"
     },
-    "bid_strategy": {
-        "price_side": "bid",
-        "ask_last_balance": 0.0,
+    "entry_pricing": {
+        "price_side": "same",
+        "price_last_balance": 0.0,
         "use_order_book": true,
         "order_book_top": 1,
         "check_depth_of_market": {
@@ -23,8 +23,8 @@
             "bids_to_ask_delta": 1
         }
     },
-    "ask_strategy": {
-        "price_side": "ask",
+    "exit_pricing": {
+        "price_side": "same",
         "use_order_book": true,
         "order_book_top": 1
     },

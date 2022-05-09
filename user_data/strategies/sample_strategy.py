@@ -33,7 +33,7 @@ class SampleStrategy(IStrategy):
 
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
-    INTERFACE_VERSION = 2
+    INTERFACE_VERSION = 3
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
@@ -66,23 +66,23 @@ class SampleStrategy(IStrategy):
     process_only_new_candles = False
 
     # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 30
 
     # Optional order type mapping.
     order_types = {
-        "buy": "limit",
-        "sell": "limit",
+        "entry": "limit",
+        "exit": "limit",
         "stoploss": "market",
         "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {"buy": "gtc", "sell": "gtc"}
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     # fmt: off
     plot_config = {
@@ -343,13 +343,7 @@ class SampleStrategy(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        """
-        Based on TA indicators, populates the buy signal for the given dataframe
-        :param dataframe: DataFrame populated with indicators
-        :param metadata: Additional information, like the currently traded pair
-        :return: DataFrame with buy column
-        """
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 # Signal: RSI crosses above 30
@@ -358,18 +352,12 @@ class SampleStrategy(IStrategy):
                 & (dataframe["tema"] > dataframe["tema"].shift(1))  # Guard: tema below BB middle
                 & (dataframe["volume"] > 0)  # Guard: tema is raising  # Make sure Volume is not 0
             ),
-            "buy",
-        ] = 1
+            ["enter_long", "enter_tag"],
+        ] = (1, "buy_reason")
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        """
-        Based on TA indicators, populates the sell signal for the given dataframe
-        :param dataframe: DataFrame populated with indicators
-        :param metadata: Additional information, like the currently traded pair
-        :return: DataFrame with sell column
-        """
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 # Signal: RSI crosses above 70
@@ -378,6 +366,6 @@ class SampleStrategy(IStrategy):
                 & (dataframe["tema"] < dataframe["tema"].shift(1))  # Guard: tema above BB middle
                 & (dataframe["volume"] > 0)  # Guard: tema is falling  # Make sure Volume is not 0
             ),
-            "sell",
-        ] = 1
+            ["exit_long", "exit_tag"],
+        ] = (1, "some_exit_tag")
         return dataframe

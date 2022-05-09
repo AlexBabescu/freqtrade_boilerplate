@@ -9,6 +9,8 @@ from pandas import DataFrame
 
 class LookaheadStrategy(IStrategy):
 
+    INTERFACE_VERSION = 3
+
     # Buy hyperspace params:
     buy_params = {
         "buy_fast": 2,
@@ -69,7 +71,7 @@ class LookaheadStrategy(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         conditions = []
 
@@ -83,11 +85,14 @@ class LookaheadStrategy(IStrategy):
         )
 
         if conditions:
-            dataframe.loc[reduce(lambda x, y: x & y, conditions), "buy"] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), ["enter_long", "enter_tag"]] = (
+                1,
+                "buy_reason",
+            )
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         conditions = []
 
@@ -100,5 +105,8 @@ class LookaheadStrategy(IStrategy):
         )
 
         if conditions:
-            dataframe.loc[reduce(lambda x, y: x & y, conditions), "sell"] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), ["exit_long", "exit_tag"]] = (
+                1,
+                "some_exit_tag",
+            )
         return dataframe
