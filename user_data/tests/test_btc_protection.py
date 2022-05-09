@@ -51,7 +51,7 @@ def test_btc_drop_protection(strategy, pair, btc_drop_timerange):
 
     for _, row in df.iterrows():
         if time_in_range(btc_drop_timerange[0], btc_drop_timerange[1], row["date"].to_pydatetime()):
-            if row["buy"] != 0:
+            if row["enter_long"] != 0:
                 raise BTCDropProtectionException("BTC drop protection failed")
 
 

@@ -1,13 +1,10 @@
-from functools import reduce
-
-import freqtrade.vendor.qtpylib.indicators as qtpylib
-import talib.abstract as ta
-from freqtrade.strategy import merge_informative_pair
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 
 
 class AlwaysBuy(IStrategy):
+
+    INTERFACE_VERSION = 3
 
     # ROI table:
     # fmt: off
@@ -29,19 +26,19 @@ class AlwaysBuy(IStrategy):
     trailing_only_offset_is_reached = True
     # Buy hypers
     timeframe = "5m"
-    use_sell_signal = False
+    use_exit_signal = False
     # #################### END OF RESULT PLACE ####################
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
-        dataframe.loc[:, "buy"] = 1
+        dataframe.loc[:, ["enter_long", "enter_tag"]] = (1, "entry_reason")
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         return dataframe

@@ -42,11 +42,11 @@ def test_buy_signals_for_lookahead_bias(strategy, pair):
 
     df = strategy.analyze_ticker(candles.copy(), {"pair": pair})
 
-    col = ["date", "buy"]
-    if "buy_tag" in df.columns:
-        col += ["buy_tag"]
+    col = ["date", "enter_long"]
+    if "enter_tag" in df.columns:
+        col += ["enter_tag"]
 
-    last_buy_signals = df[df["buy"] == 1][col].tail(no_of_signals_to_check).copy()
+    last_buy_signals = df[df["enter_long"] == 1][col].tail(no_of_signals_to_check).copy()
 
     assert len(last_buy_signals) == no_of_signals_to_check
 
@@ -72,7 +72,7 @@ def test_buy_signals_for_lookahead_bias(strategy, pair):
         new_signal = analyzed_df[analyzed_df["date"] == signal.date]
 
         # Check that the signal is still a buy signal
-        if new_signal.iloc[0].buy != 1:
+        if new_signal.iloc[0].enter_long != 1:
             raise LookaheadBiasException(
                 f"Strategy {strategy} failed to generate a buy at {signal.date}. Lookahead bias?"
             )
